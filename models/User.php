@@ -2,15 +2,34 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
-{
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+use yii\web\IdentityInterface;
 
-    private static $users = [
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property int $status
+ * @property string $role
+ * @property string $username
+ * @property string $password
+ * @property string|null $authKey
+ * @property string|null $accessToken
+ *
+ * @property Account[] $accounts
+ * @property Invoice[] $invoices
+ * @property Project[] $projects
+ */
+class User extends ActiveRecord implements IdentityInterface
+{
+    public int $id;
+    public string $username;
+    public string $password;
+    public string $authKey;
+    public string $accessToken;
+
+    private static array $users = [
         '100' => [
             'id' => '100',
             'username' => 'admin',
@@ -27,6 +46,13 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
         ],
     ];
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'user';
+    }
 
     /**
      * {@inheritdoc}
@@ -100,5 +126,69 @@ class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         return $this->password === $password;
+    }
+
+    public function rules()
+    {
+        return [
+            [['status'], 'integer'],
+            [['username', 'password'], 'required'],
+            [['role', 'username', 'password', 'authKey', 'accessToken'], 'string', 'max' => 255],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'status' => 'Status',
+            'role' => 'Role',
+            'username' => 'Username',
+            'password' => 'Password',
+            'authKey' => 'Auth Key',
+            'accessToken' => 'Access Token',
+        ];
+    }
+
+    /**
+     * Gets query for [[Accounts]].
+     *
+     * @return ActiveQuery|AccountQuery
+     */
+    public function getAccounts(): ActiveQuery|AccountQuery
+    {
+        return $this->hasMany(Account::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Invoices]].
+     *
+     * @return ActiveQuery|InvoiceQuery
+     */
+    public function getInvoices(): ActiveQuery|InvoiceQuery
+    {
+        return $this->hasMany(Invoice::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Projects]].
+     *
+     * @return ActiveQuery|ProjectQuery
+     */
+    public function getProjects(): ActiveQuery|ProjectQuery
+    {
+        return $this->hasMany(Project::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return UserQuery the active query used by this AR class.
+     */
+    public static function find(): UserQuery
+    {
+        return new UserQuery(get_called_class());
     }
 }
