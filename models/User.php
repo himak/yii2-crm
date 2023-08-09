@@ -23,12 +23,6 @@ use yii\web\IdentityInterface;
  */
 class User extends ActiveRecord implements IdentityInterface
 {
-    public int $id;
-    public string $username;
-    public string $password;
-    public string $authKey;
-    public string $accessToken;
-
     private static array $users = [
         '100' => [
             'id' => '100',
@@ -91,6 +85,8 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return null;
+
+//        return static::findOne(['username' => $username]);
     }
 
     /**
@@ -132,7 +128,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['status'], 'integer'],
-            [['username', 'password'], 'required'],
+            [['status', 'role', 'username', 'password'], 'required'],
             [['role', 'username', 'password', 'authKey', 'accessToken'], 'string', 'max' => 255],
         ];
     }

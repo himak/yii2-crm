@@ -16,7 +16,7 @@ class m230802_191839_create_user_table extends Migration
     {
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
-            'status' => $this->boolean()->notNull()->defaultValue(Status::ACTIVE->value),
+            'status' => $this->boolean()->notNull()->defaultValue(Status::DEACTIVATED->value),
             'role' => $this->string()->notNull()->defaultValue(Role::USER->value),
             'username' => $this->string()->notNull(),
             'password' => $this->string()->notNull(),
